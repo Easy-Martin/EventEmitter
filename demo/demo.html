@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <button>aaaa</button>
+    <script src="../dist/EventEmitter.js"></script>
+    <script>
+        const Emitter = new EventEmitter()
+        class test {
+
+            constructor() {
+                this.name = 'aaaa'
+                this.event = new EventEmitter()
+                this.event.once('aaaa', this.callback, this)
+                this.event.emit('aaaa')
+                this.event.once('aaaa', this.callback, this)
+                this.event.off('aaaa', this.callback)
+                this.event.emit('aaaa')
+                console.log(this.event)
+            }
+            callback() {
+                alert(this.name)
+            }
+        }
+        // new test()
+        let ele = document.getElementsByTagName('button')[0];
+        ele.onclick = function (event) {
+            console.log(event, 11111)
+            Emitter.once('aaaa', (event) => { console.log(event) }, this)
+            Emitter.emit('aaaa',event)
+        }
+    </script>
+</body>
+
+</html>

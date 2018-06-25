@@ -1,0 +1,14 @@
+{
+  "name": "event-emitter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/EventEmitter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "event"
+  ],
+  "author": "hjj",
+  "license": "MIT"
+}
