@@ -2,6 +2,9 @@ export default class EventEmitter {
     constructor() {
         this.events = {};
     }
+    get Events() {
+        return this.events;
+    }
     once(eventName, listener, context) {
         return this.on(eventName, listener, context, 0);
     }
@@ -20,6 +23,11 @@ export default class EventEmitter {
     off(eventName) {
         this.events[eventName] && delete this.events[eventName];
     }
+    removeEventListener(eventName, listener) {
+        let listeners = this.getListeners(eventName);
+        let index = listeners.findIndex(v => v.listener === listener);
+        index !== -1 && delete listeners[index];
+    }
     trigger(eventName, args) {
         let listeners = this.getListeners(eventName);
         for (let i = 0; i < listeners.length; i++) {
@@ -34,9 +42,6 @@ export default class EventEmitter {
     }
     getListeners(eventName) {
         return this.events[eventName] || (this.events[eventName] = []);
-    }
-    get Events() {
-        return this.events;
     }
 }
 //# sourceMappingURL=EventEmitter.js.map

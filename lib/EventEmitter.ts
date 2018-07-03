@@ -12,6 +12,13 @@ export default class EventEmitter {
     private events: { [key: string]: Array<EventListen> } = {}
 
     /**
+     * 获取事件对象
+     */
+    get Events(): { [key: string]: Array<EventListen> } {
+        return this.events
+    }
+
+    /**
      * 绑定后执行一次
      * @param eventName string -> eventName
      * @param listener Function -> Event callback
@@ -28,7 +35,12 @@ export default class EventEmitter {
      * @param context Object
      * @param timer number -> timer
      */
-    on(eventName: string, listener: Function, context?: Object, timer: number = -1) {
+    on(
+        eventName: string,
+        listener: Function,
+        context?: Object,
+        timer: number = -1
+    ) {
         let listeners = this.getListeners(eventName)
         listeners.push({
             listener,
@@ -50,10 +62,20 @@ export default class EventEmitter {
      * 事件解绑
      * @param eventName string event Name
      */
-    off(eventName: string) {
+    remove(eventName: string) {
         this.events[eventName] && delete this.events[eventName]
     }
 
+    /**
+     * 移除事件监听
+     * @param eventName string
+     * @param listener Function
+     */
+    off(eventName: string, listener: Function) {
+        let listeners = this.getListeners(eventName)
+        let index = listeners.findIndex(v => v.listener === listener)
+        index !== -1 && delete listeners[index]
+    }
 
     /**
      * 事件触发器
@@ -77,14 +99,7 @@ export default class EventEmitter {
      * 获取所有Listener
      * @param eventName
      */
-    private getListeners(eventName: string) {
+    private getListeners(eventName: string): Array<EventListen> {
         return this.events[eventName] || (this.events[eventName] = [])
-    }
-
-    /**
-     * 获取事件对象
-     */
-    get Events(): { [key: string]: Array<EventListen> } {
-        return this.events
     }
 }
