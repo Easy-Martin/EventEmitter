@@ -15,23 +15,40 @@ class EventEmitter {
             timer
         });
     }
-    emit(eventName, context, ...args) {
-        return this.trigger(eventName, args, context);
+    emit(eventName, ...args) {
+        return this.trigger(eventName, args);
     }
     remove(eventName) {
         this.events[eventName] && delete this.events[eventName];
     }
     off(eventName, listener) {
-        let listeners = this.getListeners(eventName);
-        let index = listeners.findIndex(v => v.listener === listener);
-        index !== -1 && listeners.splice(index, 1);
+        let reg = /\{\s*\[native code\]\s*\}/;
+        let listenerStr = listener.toString();
+        let isNativeOff = reg.test(listenerStr);
+        if (isNativeOff)
+            return;
+        if (listener && typeof listener === 'function') {
+            let listeners = this.getListeners(eventName);
+            listeners.map((item, index) => {
+                let listenersItemStr = item.listener.toString();
+                if (!reg.test(listenersItemStr) &&
+                    listenersItemStr === listenerStr) {
+                    delete listeners[index];
+                }
+            });
+            listeners.map(v => !!v).length === 0 &&
+                delete this.events[eventName];
+        }
+        else {
+            delete this.events[eventName];
+        }
     }
-    trigger(eventName, args, context) {
+    trigger(eventName, args) {
         let listeners = this.getListeners(eventName);
         for (let i = 0; i < listeners.length; i++) {
             let listener = listeners[i];
             if (listener) {
-                listener.listener.apply(context || null, args || []);
+                listener.listener.apply(this, args || []);
                 listener.timer === 0 && listeners.splice(i, 1);
                 listeners.length === 0 && delete this.events[eventName];
                 listener.timer !== -1 && listener.timer--;
@@ -42,4 +59,3 @@ class EventEmitter {
         return this.events[eventName] || (this.events[eventName] = []);
     }
 }
-//# sourceMappingURL=EventEmitter.js.map

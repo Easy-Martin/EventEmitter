@@ -9,6 +9,6 @@
         "experimentalDecorators":true,
         "outDir": "dist"
     },
-    "files":["lib/EventEmitter.ts","lib/Decorator.ts","lib/index.ts"],
+    "files":["lib/EventEmitter.ts","lib/index.ts"],
     
 }

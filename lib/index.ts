@@ -1,13 +1,7 @@
 import EventEmitter, { EventListen, EventEmitterType } from './EventEmitter'
 
-import eventDecorator from './Decorator'
-
-export default EventEmitter
-
+export default new EventEmitter()
 
 export type EventListen = EventListen
 
-export {
-    EventEmitterType,
-    eventDecorator
-}
+export { EventEmitterType, EventEmitter }

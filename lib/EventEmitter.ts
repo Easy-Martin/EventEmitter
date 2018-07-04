@@ -56,8 +56,8 @@ export default class EventEmitter implements EventEmitterType {
      * 对外得事件触发器
      * @param eventName string event Name
      */
-    emit(eventName: string, context?: Object, ...args: Array<any>) {
-        return this.trigger(eventName, args, context)
+    emit(eventName: string, ...args: Array<any>) {
+        return this.trigger(eventName, args)
     }
 
     /**
@@ -74,9 +74,27 @@ export default class EventEmitter implements EventEmitterType {
      * @param listener Function
      */
     off(eventName: string, listener: Function) {
-        let listeners = this.getListeners(eventName)
-        let index = listeners.findIndex(v => v.listener === listener)
-        index !== -1 && listeners.splice(index, 1)
+        let reg = /\{\s*\[native code\]\s*\}/
+        let listenerStr = listener.toString()
+        let isNativeOff = reg.test(listenerStr)
+        if (isNativeOff) return
+        if (listener && typeof listener === 'function') {
+            let listeners = this.getListeners(eventName)
+            listeners.map((item, index) => {
+                let listenersItemStr = item.listener.toString()
+                if (
+                    !reg.test(listenersItemStr) &&
+                    listenersItemStr === listenerStr
+                ) {
+                    delete listeners[index]
+                }
+            })
+
+            listeners.map(v => !!v).length === 0 &&
+                delete this.events[eventName]
+        } else {
+            delete this.events[eventName]
+        }
     }
 
     /**
@@ -84,12 +102,12 @@ export default class EventEmitter implements EventEmitterType {
      * @param eventName
      * @param args
      */
-    private trigger(eventName: string, args: Array<any>, context?: Object) {
+    private trigger(eventName: string, args: Array<any>) {
         let listeners = this.getListeners(eventName)
         for (let i = 0; i < listeners.length; i++) {
             let listener = listeners[i]
             if (listener) {
-                listener.listener.apply(context || null, args || [])
+                listener.listener.apply(this, args || [])
                 listener.timer === 0 && listeners.splice(i, 1)
                 listeners.length === 0 && delete this.events[eventName]
                 listener.timer !== -1 && listener.timer--

@@ -1,5 +1,4 @@
 import EventEmitter from './EventEmitter';
-import eventDecorator from './Decorator';
-export default EventEmitter;
-export { eventDecorator };
+export default new EventEmitter();
+export { EventEmitter };
 //# sourceMappingURL=index.js.map
