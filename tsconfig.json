@@ -1,12 +1,14 @@
 {
+    
     "compilerOptions": {
         "target": "es6",
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": true,
+        "experimentalDecorators":true,
         "outDir": "dist"
     },
-    "files":["lib/EventEmitter.ts"],
+    "files":["lib/EventEmitter.ts","lib/Decorator.ts","lib/index.ts"],
     
 }

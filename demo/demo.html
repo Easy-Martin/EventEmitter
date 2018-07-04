@@ -17,25 +17,17 @@
 
             constructor() {
                 this.name = 'aaaa'
-                this.event = new EventEmitter()
-                this.event.once('aaaa', this.callback, this)
-                this.event.emit('aaaa')
-                this.event.once('aaaa', this.callback, this)
-                this.event.off('aaaa', this.callback)
-                this.event.emit('aaaa')
-                console.log(this.event)
+                Emitter.once('aaaa', this.callback)
+                Emitter.emit('aaaa',this)
+                Emitter.on('aaaa', this.callback)
+                Emitter.off('aaaa', this.callback)
+                Emitter.emit('aaaa',this)
             }
             callback() {
                 alert(this.name)
             }
         }
-        // new test()
-        let ele = document.getElementsByTagName('button')[0];
-        ele.onclick = function (event) {
-            console.log(event, 11111)
-            Emitter.once('aaaa', (event) => { console.log(event) }, this)
-            Emitter.emit('aaaa',event)
-        }
+        let aaa = new test()
     </script>
 </body>
 

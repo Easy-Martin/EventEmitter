@@ -1,41 +1,39 @@
-export default class EventEmitter {
+class EventEmitter {
     constructor() {
         this.events = {};
     }
-    get Events() {
+    getEvents() {
         return this.events;
     }
-    once(eventName, listener, context) {
-        return this.on(eventName, listener, context, 0);
+    once(eventName, listener) {
+        return this.on(eventName, listener, 0);
     }
-    on(eventName, listener, context, timer = -1) {
+    on(eventName, listener, timer = -1) {
         let listeners = this.getListeners(eventName);
         listeners.push({
             listener,
-            timer,
-            context
+            timer
         });
     }
-    emit(eventName) {
-        const args = Array.prototype.slice.call(arguments, 1);
-        return this.trigger(eventName, args);
+    emit(eventName, context, ...args) {
+        return this.trigger(eventName, args, context);
     }
-    off(eventName) {
+    remove(eventName) {
         this.events[eventName] && delete this.events[eventName];
     }
-    removeEventListener(eventName, listener) {
+    off(eventName, listener) {
         let listeners = this.getListeners(eventName);
         let index = listeners.findIndex(v => v.listener === listener);
-        index !== -1 && delete listeners[index];
+        index !== -1 && listeners.splice(index, 1);
     }
-    trigger(eventName, args) {
+    trigger(eventName, args, context) {
         let listeners = this.getListeners(eventName);
         for (let i = 0; i < listeners.length; i++) {
             let listener = listeners[i];
             if (listener) {
-                const ctx = listener.context ? listener.context : null;
-                listener.listener.apply(ctx, args || []);
-                listener.timer === 0 && delete listeners[i];
+                listener.listener.apply(context || null, args || []);
+                listener.timer === 0 && listeners.splice(i, 1);
+                listeners.length === 0 && delete this.events[eventName];
                 listener.timer !== -1 && listener.timer--;
             }
         }

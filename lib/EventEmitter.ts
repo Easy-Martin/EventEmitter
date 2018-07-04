@@ -1,9 +1,18 @@
-type EventListen = {
+export type EventListen = {
     listener: Function
     timer: number
-    context?: Object
 }
-export default class EventEmitter {
+
+export interface EventEmitterType {
+    on: (eventName: string, listener: Function, timer?: number) => void
+    emit: (eventName: string, context?: Object, ...args: Array<any>) => void
+    remove: (eventName: string) => void
+    off: (eventName: string, listener: Function) => void
+    once: (eventName: string, listener: Function) => void
+    getEvents: () => { [key: string]: Array<EventListen> }
+}
+
+export default class EventEmitter implements EventEmitterType {
     constructor() {}
 
     /**
@@ -14,7 +23,7 @@ export default class EventEmitter {
     /**
      * 获取事件对象
      */
-    get Events(): { [key: string]: Array<EventListen> } {
+    getEvents(): { [key: string]: Array<EventListen> } {
         return this.events
     }
 
@@ -24,8 +33,8 @@ export default class EventEmitter {
      * @param listener Function -> Event callback
      * @param context Object
      */
-    once(eventName: string, listener: Function, context?: Object) {
-        return this.on(eventName, listener, context, 0)
+    once(eventName: string, listener: Function) {
+        return this.on(eventName, listener, 0)
     }
 
     /**
@@ -35,17 +44,11 @@ export default class EventEmitter {
      * @param context Object
      * @param timer number -> timer
      */
-    on(
-        eventName: string,
-        listener: Function,
-        context?: Object,
-        timer: number = -1
-    ) {
+    on(eventName: string, listener: Function, timer: number = -1) {
         let listeners = this.getListeners(eventName)
         listeners.push({
             listener,
-            timer,
-            context
+            timer
         })
     }
 
@@ -53,9 +56,8 @@ export default class EventEmitter {
      * 对外得事件触发器
      * @param eventName string event Name
      */
-    emit(eventName: string) {
-        const args = Array.prototype.slice.call(arguments, 1)
-        return this.trigger(eventName, args)
+    emit(eventName: string, context?: Object, ...args: Array<any>) {
+        return this.trigger(eventName, args, context)
     }
 
     /**
@@ -74,7 +76,7 @@ export default class EventEmitter {
     off(eventName: string, listener: Function) {
         let listeners = this.getListeners(eventName)
         let index = listeners.findIndex(v => v.listener === listener)
-        index !== -1 && delete listeners[index]
+        index !== -1 && listeners.splice(index, 1)
     }
 
     /**
@@ -82,14 +84,14 @@ export default class EventEmitter {
      * @param eventName
      * @param args
      */
-    private trigger(eventName: string, args: Array<any>) {
+    private trigger(eventName: string, args: Array<any>, context?: Object) {
         let listeners = this.getListeners(eventName)
         for (let i = 0; i < listeners.length; i++) {
             let listener = listeners[i]
             if (listener) {
-                const ctx = listener.context ? listener.context : null
-                listener.listener.apply(ctx, args || [])
-                listener.timer === 0 && delete listeners[i]
+                listener.listener.apply(context || null, args || [])
+                listener.timer === 0 && listeners.splice(i, 1)
+                listeners.length === 0 && delete this.events[eventName]
                 listener.timer !== -1 && listener.timer--
             }
         }
