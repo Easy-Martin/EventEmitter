@@ -74,27 +74,9 @@ export default class EventEmitter implements EventEmitterType {
      * @param listener Function
      */
     off(eventName: string, listener: Function) {
-        let reg = /\{\s*\[native code\]\s*\}/
-        let listenerStr = listener.toString()
-        let isNativeOff = reg.test(listenerStr)
-        if (isNativeOff) return
-        if (listener && typeof listener === 'function') {
-            let listeners = this.getListeners(eventName)
-            listeners.map((item, index) => {
-                let listenersItemStr = item.listener.toString()
-                if (
-                    !reg.test(listenersItemStr) &&
-                    listenersItemStr === listenerStr
-                ) {
-                    delete listeners[index]
-                }
-            })
-
-            listeners.map(v => !!v).length === 0 &&
-                delete this.events[eventName]
-        } else {
-            delete this.events[eventName]
-        }
+        let listeners = this.getListeners(eventName)
+        let index = listeners.findIndex(item => item.listener === listener)
+        index !== -1 && listeners.splice(index, 1)
     }
 
     /**

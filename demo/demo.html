@@ -17,23 +17,15 @@
 
             constructor() {
                 this.name = 'aaaa'
-                Emitter.on('aaaa', () => {
-                    this.callback()
-                })
-                Emitter.on('aaaa', () => {
-                    this.callback()
-                })
-                Emitter.on('aaaa', () => {
-                    this.callback2()
-                })
-                Emitter.on('aaaa', () => {
-                    this.callback2()
-                })
+                let callback = () => { this.callback() }
+                let callback2 = () => { this.callback2() }
 
-                Emitter.off('aaaa', () => {
-                    this.callback2()
-                })
-                
+                Emitter.on('aaaa', callback)
+                Emitter.on('aaaa', callback)
+                Emitter.on('aaaa', callback2)
+                Emitter.on('aaaa', callback2)
+                Emitter.off('aaaa', callback2)
+                Emitter.off('aaaa')
                 Emitter.emit('aaaa')
             }
             callback() {
